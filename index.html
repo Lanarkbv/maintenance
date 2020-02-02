@@ -2,215 +2,140 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Load required Bootstrap and BootstrapVue CSS -->
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
-    <!-- Load polyfills to support older browsers -->
-    <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"
-        crossorigin="anonymous"></script>
-    <!-- Load Vue followed by BootstrapVue -->
-    <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <!-- Load the following for BootstrapVueIcons support -->
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
-    <style type="text/css">
-        html {
-            position: relative;
-            min-height: 100%;
-        }
-        body {
-            margin-bottom: 60px; /* Margin bottom by footer height */
-        }
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60px; /* Set the fixed height of the footer here */
-            line-height: 60px; /* Vertically center the text there */}
-    </style>
-
-    <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Load required Bootstrap and BootstrapVue CSS -->
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+  <!-- Load polyfills to support older browsers -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"
+    crossorigin="anonymous"></script>
+  <!-- Load Vue followed by BootstrapVue -->
+  <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- Load the following for BootstrapVueIcons support -->
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+  <style type="text/css">
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+    body {
+        margin-bottom: 60px; /* Margin bottom by footer height */
+    }
+    .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 60px; /* Set the fixed height of the footer here */
+        line-height: 60px; /* Vertically center the text there */}
+</style>
+  <title></title>
 </head>
 
 <body style="padding-top: 56px;">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">Talenco Asset Management</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Asset
-                            <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Help</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- vue app div-->
-    <div id="vapp">
-        <!-- Page Content -->
-        <div class="container">
-
-            <div class="row">
-
-                <div class="col-lg-3">
-
-                    <h1 class="my-4">{{ assetName }}</h1>
-
-                    <div class="list-group" v-for="fileType in fileTypes">
-                        <button type="button" class="list-group-item list-group-item-action"
-                            :class="(fileType.Number && fileType.Show) ? 'list-group-item-' + fileType.Colour : 'list-group-item-secondary'" @click="toggle(fileType);">
-                            {{ fileType.Name }}
-                            <span class="badge badge-secondary">{{ fileType.Number }}</span>
-                        </button>
-                    </div>
-
-                </div>
-                <!-- /.col-lg-3 -->
-
-                <div class="col-lg-9">
-
-                    <b-carousel id="carouselPictures" controls class="my-4 text-center" background="#ababab"
-                        style="max-width: 900px; height: 250px;">
-                        <b-carousel-slide v-if="pictures.length == 0" img-src="https://placehold.it/900x250">
-                        </b-carousel-slide>
-                        <b-carousel-slide v-for="picture in pictures">
-                            <template v-slot:img>
-                                <img :src="urlFetch + '/' + picture.Name + '?imagetype=2'" style="height: 250px; margin: auto;">
-                            </template>
-                        </b-carousel-slide>
-                    </b-carousel>
-
-                    <div class="row m-4">
-                        <div class="card-deck">
-                            <div v-for="document in filteredDocuments" class="card">
-                                <a class="card-block stretched-link text-decoration-none"  :href="urlFetch + '/' + document.Name"></a>
-                                <div class="card-body" :class="'bg-' + fileTypes[docType({str: document.Name, type: 'short'})].Colour">
-                                    <p class="card-text text-dark">{{ document.Name.split('.').slice(0, -1).join('.') }}</p>
-                                </div>
-                                <div class="card-footer">
-                                    <small class="text-muted">Uploaded {{ document.MTime.substr(0, document.MTime.indexOf('T')) }}</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.row -->
-
-                </div>
-                <!-- /.col-lg-9 -->
-
-            </div>
-            <!-- /.row -->
-
-        </div>
-        <!-- /.container -->
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Talenco Asset Management</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Asset
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Help</a>
+          </li>
+        </ul>
+      </div>
     </div>
-    <!-- end vue div -->
+  </nav>
 
-    <!-- Footer -->
-    <footer class="footer bg-dark">
-        <div class="container">
-            <p class="m-0 text-center text-white">Powered by Lanark & Esoptra</p>
-        </div>
-        <!-- /.container -->
-    </footer>
+  <!-- vue app div-->
+  <div id="vapp">
+    <!-- Page Content -->
+    <div class="container">
 
-    <!-- SCRIPTS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+      <div class="row">
+        <!-- Image Map Generated by http://www.image-map.net/ -->
+        <img src="./image/oil_filler_line2.jpg" usemap="#imagemap" id="mymap">
 
-    <script>
-        // Set the domain to avoid CORS issue
-        // document.domain = "files.zaza.rocks";
+        <map name="imagemap">
+          <area target="_blank" alt="Filling Head" title="Filling Head"
+            href="https://zaza.rocks/875469c1922eb9a226de08024304147c" coords="291,240,84,136" shape="rect">
+          <area target="_blank" alt="Filling Control Panel" title="Filling Control Panel"
+            href="https://zaza.rocks/2bc224e9536b757cc075f22438a400e4" coords="410,131,330,176" shape="rect">
+          <area target="_blank" alt="Conveyor Part 1" title="Conveyor Part 1"
+            href="https://zaza.rocks/9206df43cd198136b7831e1b12d1be70" coords="573,268,331,229" shape="rect">
+        </map>
+      </div>
+      <!-- /.row -->
 
-        // URLs
-        var strLoc = window.location.pathname;
-        var arrLoc = strLoc.split('/');
-        var strQID = arrLoc[2];
-        var urlGetFiles = "https://files.zaza.rocks/getfiles/" + strQID;
-        var urlFetch = "https://files.zaza.rocks/fetch/" + strQID;
-        var urlMetaInfo = urlFetch + "/donotdelete.json";
+    </div>
+    <!-- /.container -->
+  </div>
+  <!-- end vue div -->
 
-        // document file types
-        var documentFileTypes = [".pdf", ".docx", ".doc", ".txt", ".rtf", ".xlsx", ".xls", ".ppt", ".pptx"];
-        var imageFileTypes = [".jpg", ".jpeg", ".png"];
+  <!-- Footer -->
+  <footer class="footer bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">Powered by Lanark & Esoptra</p>
+    </div>
+    <!-- /.container -->
+  </footer>
 
-        const vueApp = new Vue({
-            el: "#vapp",
-            data: {
-                fileTypes: {
-                    td: { Name: "Technical Drawings", Colour: "primary", Number: 0, Show: true },
-                    ir: { Name: "Inspection Reports", Colour: "success", Number: 0, Show: true },
-                    mr: { Name: "Maintenance Reports", Colour: "warning", Number: 0, Show: true },
-                    other: { Name: "Other Documents", Colour: "info", Number: 0, Show: true}
-                },
-                allFiles: [],
-                assetName: ""
-            },
-            mounted() {
-                axios.get(urlGetFiles)
-                    .then((response) => { this.allFiles = response.data; this.setCounters(); })
-                    .catch((error) => { console.log("Error #3: " + error); });
-                axios.get(urlMetaInfo)
-                    .then((response) => { this.assetName = response.data.name; })
-                    .catch((error) => { console.log("Error #4: " +  error); });
+  <!-- SCRIPTS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/jquery-imagemapster@1.2.10/dist/jquery.imagemapster.js"
+    crossorigin="anonymous"></script>
 
-            },
-            methods: {
-                printfiles: function () { console.log(this.filteredDocuments) },
-                setCounters: function () { 
-                    this.fileTypes.td.Number = this.allFiles.filter((item) => (item.Name.toLowerCase().startsWith("td_"))).length;
-                    this.fileTypes.ir.Number = this.allFiles.filter((item) => (item.Name.toLowerCase().startsWith("ir_") && documentFileTypes.indexOf(item.Extention.toLowerCase()) !== -1)).length;
-                    this.fileTypes.mr.Number = this.allFiles.filter((item) => (item.Name.toLowerCase().startsWith("mr_") && documentFileTypes.indexOf(item.Extention.toLowerCase()) !== -1)).length;
-                    this.fileTypes.other.Number = this.documents.length - ( this.fileTypes.td.Number + this.fileTypes.ir.Number + this.fileTypes.mr.Number );
-                },
-                docType: function (o) {
-                    switch (o.str.toLowerCase().substr(0,2)){
-                        case "td": return (o.type == "long" ? "Technical Drawing" : "td"); break;
-                        case "ir": return (o.type == "long" ? "Inspection Report" : "ir"); break;
-                        case "mr": return (o.type == "long" ? "Maintenance Report" : "mr"); break;
-                        default: return (o.type == "long" ? "Other" : "other");
-                    }
-                },
-                toggle: function (ft) {
-                    ft.Show = !ft.Show;
-                }
-
-            },
-            computed: {
-                pictures: function () {
-                    return this.allFiles.filter((item) => (!item.Name.toLowerCase().startsWith("td_") && imageFileTypes.indexOf(item.Extention.toLowerCase()) !== -1));
-                },
-                documents: function() {
-                    return this.allFiles.filter((item) => (item.Name.toLowerCase().startsWith("td_") || documentFileTypes.indexOf(item.Extention.toLowerCase()) !== -1));
-                },
-                filteredDocuments: function() {
-                    return this.documents.filter((item) => (this.fileTypes[this.docType({str: item.Name, type: "short"})].Show));
-                }
-            }
+  <script>
+    $('#mymap').mapster({
+      fillColor: 'ff0000',
+      fillOpacity: 0.3,
+      onClick: function(data) {
+        data.e.preventDefault();
+        var target = $(this).attr('target');
+        if (target === '_blank') {
+          window.open($(this).attr('href'));
         }
-        )
-    </script>
+        return false;
+      }
+    }
+    );
+
+    
+    // document file types
+    var documentFileTypes = [".pdf", ".docx", ".doc", ".txt", ".rtf", ".xlsx", ".xls", ".ppt", ".pptx"];
+
+    /* const vueApp = new Vue({
+      el: "#vapp",
+      data: {
+      },
+      mounted() {
+      },
+      methods: {
+      },
+      computed: {
+      }
+    }
+    ) */
+  </script>
 
 
 
